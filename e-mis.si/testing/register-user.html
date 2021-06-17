@@ -1,0 +1,84 @@
+<html>
+
+<head>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+</head>
+
+<body>
+    
+    
+    <label>Device ID: </label>
+    <input disabled placeholder="(automatic)" id="deviceId" type="text"><br>
+    <label>Email: </label>
+    <input id="email" type="text"><br>
+    <label>Password: </label>
+    <input id="pass" type="text"><br>
+    <label>Username: </label>
+    <input id="username" type="text"><br>
+    <label>Phone (optional): </label>
+    <input disabled placeholder="unavailable" id="phone" type="text"><br>
+    
+    <button type="button" id="pushData">Push data </button> <button disabled type="button" id="pullData">Pull data</button><br><br><br>
+    <div id="ret" style="border: 3px solid gray;display: block;height: 200px;width: 500px;"></div>
+
+    
+    
+    <script>
+        window.onerror = function(msg, url, linenumber) {
+            alert('Error message: ' + msg + '\nURL: ' + url + '\nLine Number: ' + linenumber);
+            console.log('Error message: ' + msg + '\nURL: ' + url + '\nLine Number: ' + linenumber);
+            return true;
+        }
+        
+        window.onload = function(){
+            POST('backend/getUsers.php', {api_key: "zDK3yYY839"},'text', function(err,data){
+               if(err){
+					alert('Server Error! '+ err);
+				}
+               
+               if(data){
+                   data = JSON.parse(data);
+                   data.forEach(function(data){
+                        var o = new Option(data['username'] + " ("+ data['userId'] + ")", data['userId']);
+                        //$(o).html("option text");
+                        $("#userSelect").append(o);
+                   });
+               }
+           });
+        }
+
+        function POST(url, data, dataType, cb) {
+
+            $.ajax({
+                url: url,
+                method: 'POST',
+                data: data,
+                dataType: dataType,
+                success: function(ret) {
+                    cb(null, ret);
+                },
+                error: function(xhr, status, err) {
+                    cb((err), false);
+                }
+            });
+        }
+        
+        $('#pushData').click(function(){
+            var email = $('#email').val();
+            var password = $('#pass').val();
+            var username = $('#username').val();
+            var phone = $('#phone').val();
+           POST('backend/registerUser.php', {api_key: "zDK3yYY839", email:email, password:password, username:username, phone:phone},'text', function(err,data){
+               if(err){
+					alert('Server Error!'+ err);
+				}
+               
+               if(data){
+                   $('#ret').append(data);
+               }
+           }); 
+        });
+    </script>
+</body>
+</html>
